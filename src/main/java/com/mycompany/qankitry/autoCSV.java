@@ -81,12 +81,9 @@ public class autoCSV {
         JSONArray jsonArray =  jsonObject.getJSONObject("data").getJSONArray("audioSecondary");
 
         return jsonArray.get(0);
-           
+     
        
-       
-        
-
-    } 
+} 
     
     
    
@@ -133,12 +130,12 @@ public class autoCSV {
                front.add(firstRangeStuck);
                
                
-               int x = 0;
+              
                for(int i = vRange1; i<vRange2 +1; i++){
                   
                    Object rangeStuck = getAudioLink(chapterNum, i);
                    back.add(rangeStuck);
-                   x++;
+                 
                }
         }
        ArrayList<Object>[] rVar = new ArrayList[2];
@@ -157,8 +154,7 @@ public class autoCSV {
             conn = new URL(path).openConnection();
               InputStream is = conn.getInputStream();
               
-    File file = new File( "https:/\\/cdn.islamic.network\\/quran\\/audio\\/128\\/ar.alafasy\\/798.mp3"); 
-
+    File file = new File("/Users/nigamehsan/Library/Application Support/Anki2/User 1/collection.media/"+ path.substring(path.lastIndexOf("/"))); 
      OutputStream outstream = new FileOutputStream(file);
      byte[] buffer = new byte[4096];
      int len;
@@ -169,7 +165,29 @@ public class autoCSV {
       
     }
     
+    public static void makeCSV(ArrayList<Object> front, ArrayList<Object> back) throws IOException{
+        
+       CSVWriter csvWriter = new CSVWriter(new FileWriter(new File("data.csv")));
+       
+       String[] headers = {"front","back"};
+      String[] csvData = new String[2];
+       
+       csvWriter.writeNext(headers);
+       
+       String strFront = front.get(0).toString();
+       strFront = "[sound: " + strFront.substring(strFront.lastIndexOf("/")+1) +" ]";
+       csvData[0] = strFront;
+       for(int i = 0; i < back.size(); i++){
+           String str = back.get(i).toString();
+          
+           csvData[1] = csvData[1] +"[sound:" + str.substring(str.lastIndexOf("/") +1 ) + "]";
            
+      }
+        csvWriter.writeNext(csvData);
+
+        csvWriter.close();
+        
+    }  
                    
     
         
@@ -180,21 +198,37 @@ public class autoCSV {
   
    
     public static void main(String[] args) throws IOException, MalformedURLException, URISyntaxException, InterruptedException {
+
         ArrayList<Object>[] result = organize();
         
         ArrayList<Object> frontc = result[0];
         ArrayList<Object> backc = result[1];
         
-        for(int  i = 0; i < frontc.size(); i++){
-            String strPath = frontc.get(i).toString();
-            try{
+        
+        
+        for(int i = 0; i< result.length; i++){
+            for(int j = 0; j< result[i].size(); j++ ){
+                String strPath = result[i].get(j).toString();
+                
+                 try{
             download(strPath);
+          //  System.out.println(strPath);
             
             }catch(java.io.IOException ex){
                 System.out.println(ex);
                 
             }
+            }
+            
         }
+        
+        makeCSV(frontc,backc);
+       
+        
+        
+       
+       
+        
         
         
         
